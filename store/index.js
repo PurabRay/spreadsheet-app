@@ -5,7 +5,7 @@ const loadData = () => {
     const savedData = localStorage.getItem('spreadsheetData');
     return savedData ? JSON.parse(savedData) : Array.from({ length: 20 }, () => Array(50).fill(''));
   } else {
-    return Array.from({ length: 20 }, () => Array(50).fill('')); // Default data for server-side rendering
+    return Array.from({ length: 20 }, () => Array(50).fill('')); 
   }
 };
 
@@ -22,13 +22,13 @@ const useStore = create((set) => ({
       newData[row][col] = value;
 
       if (typeof window !== 'undefined') {
-        localStorage.setItem('spreadsheetData', JSON.stringify(newData)); // Persist data
+        localStorage.setItem('spreadsheetData', JSON.stringify(newData)); 
       }
 
       return {
         data: newData,
         history: [...state.history, { row, col, previousValue }],
-        future: [], // Clear future on new changes
+        future: [], 
       };
     }),
 
