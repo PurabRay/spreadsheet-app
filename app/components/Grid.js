@@ -1,14 +1,22 @@
 "use client";
-import { useState } from 'react';
+
+import React, { useEffect, useRef } from 'react';
 import useStore from '../../store';
 
 const Grid = () => {
-  const [activeCell, setActiveCell] = useState(null);
-  const { data, updateCell, searchQuery } = useStore();
+  const { data, searchQuery, updateCell } = useStore();
+  const highlightedCellRef = useRef(null); // Reference for the highlighted cell
 
   const handleCellChange = (e, row, col) => {
     updateCell(row, col, e.target.value);
   };
+
+  useEffect(() => {
+    if (highlightedCellRef.current) {
+      highlightedCellRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [searchQuery]);
+
   const renderGrid = () => {
     const rows = [];
     for (let i = 0; i < 20; i++) {
@@ -16,6 +24,7 @@ const Grid = () => {
       for (let j = 0; j < 50; j++) {
         const cellValue = data[i][j] || '';
         const isHighlighted = searchQuery && cellValue.toLowerCase().includes(searchQuery.toLowerCase());
+
         cells.push(
           <input
             key={`${i}-${j}`}
@@ -28,7 +37,7 @@ const Grid = () => {
             }}
             value={cellValue}
             onChange={(e) => handleCellChange(e, i, j)}
-            onFocus={() => setActiveCell({ row: i, col: j })}
+            ref={isHighlighted ? highlightedCellRef : null} // Set ref if the cell is highlighted
           />
         );
       }
@@ -40,6 +49,7 @@ const Grid = () => {
     }
     return rows;
   };
+
   return (
     <div style={{ overflowX: 'auto', padding: '1rem', backgroundColor: '#f3f4f6' }}>
       {renderGrid()}
