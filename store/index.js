@@ -3,9 +3,9 @@ import create from 'zustand';
 const loadData = () => {
   if (typeof window !== 'undefined') {
     const savedData = localStorage.getItem('spreadsheetData');
-    return savedData ? JSON.parse(savedData) : Array.from({ length: 20 }, () => Array(50).fill(''));
+    return savedData ? JSON.parse(savedData) : Array.from({ length: 100 }, () => Array(50).fill('')); // Assume a larger dataset
   } else {
-    return Array.from({ length: 20 }, () => Array(50).fill('')); 
+    return Array.from({ length: 100 }, () => Array(50).fill(''));
   }
 };
 
@@ -14,6 +14,8 @@ const useStore = create((set) => ({
   history: [],
   future: [],
   searchQuery: '',
+  currentPage: 1,
+  rowsPerPage: 20,
 
   updateCell: (row, col, value) =>
     set((state) => {
@@ -22,13 +24,13 @@ const useStore = create((set) => ({
       newData[row][col] = value;
 
       if (typeof window !== 'undefined') {
-        localStorage.setItem('spreadsheetData', JSON.stringify(newData)); 
+        localStorage.setItem('spreadsheetData', JSON.stringify(newData));
       }
 
       return {
         data: newData,
         history: [...state.history, { row, col, previousValue }],
-        future: [], 
+        future: [],
       };
     }),
 
@@ -41,7 +43,7 @@ const useStore = create((set) => ({
       newData[lastChange.row][lastChange.col] = lastChange.previousValue;
 
       if (typeof window !== 'undefined') {
-        localStorage.setItem('spreadsheetData', JSON.stringify(newData)); // Persist data
+        localStorage.setItem('spreadsheetData', JSON.stringify(newData));
       }
 
       return {
@@ -61,7 +63,7 @@ const useStore = create((set) => ({
       newData[lastUndo.row][lastUndo.col] = lastUndo.nextValue;
 
       if (typeof window !== 'undefined') {
-        localStorage.setItem('spreadsheetData', JSON.stringify(newData)); // Persist data
+        localStorage.setItem('spreadsheetData', JSON.stringify(newData));
       }
 
       return {
@@ -72,6 +74,10 @@ const useStore = create((set) => ({
     }),
 
   setSearchQuery: (query) => set({ searchQuery: query }),
+
+  // Pagination-related actions
+  setCurrentPage: (page) => set({ currentPage: page }),
+  setRowsPerPage: (rows) => set({ rowsPerPage: rows }),
 }));
 
 export default useStore;
