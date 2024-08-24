@@ -3,9 +3,9 @@ import create from 'zustand';
 const loadData = () => {
   if (typeof window !== 'undefined') {
     const savedData = localStorage.getItem('spreadsheetData');
-    return savedData ? JSON.parse(savedData) : Array.from({ length: 100 }, () => Array(50).fill('')); // Assume a larger dataset
+    return savedData ? JSON.parse(savedData) : Array.from({ length: 1000 }, () => Array(50).fill('')); // Assume a large dataset
   } else {
-    return Array.from({ length: 100 }, () => Array(50).fill(''));
+    return Array.from({ length: 1000 }, () => Array(50).fill(''));
   }
 };
 
@@ -75,7 +75,7 @@ const useStore = create((set) => ({
 
   setSearchQuery: (query) => set({ searchQuery: query }),
 
-  // Pagination-related actions
+  
   setCurrentPage: (page) => set({ currentPage: page }),
   setRowsPerPage: (rows) => set({ rowsPerPage: rows }),
 }));

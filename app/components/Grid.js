@@ -8,11 +8,26 @@ const Grid = () => {
   const highlightedCellRef = useRef(null);
 
   const handleCellChange = (e, row, col) => {
-    updateCell(row, col, e.target.value);
+    let value = e.target.value;
+    
+    
+    if (col === 0) {
+      if (/[^0-9]/.test(value)) {
+        alert(`Invalid value for row ${row + 1}, column ${col + 1}. Please enter only numbers.`);
+        value = value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+      }
+    }
+    
+    updateCell(row, col, value);
   };
 
   const handleBlur = (e, row, col) => {
-    if (col === 1) {
+    if (col === 0) {
+      if (e.target.value && isNaN(e.target.value)) {
+        alert(`Invalid number at row ${row + 1}, column ${col + 1}`);
+        updateCell(row, col, ''); // Clear the invalid number input
+      }
+    } else if (col === 1) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (e.target.value && !emailRegex.test(e.target.value)) {
         alert(`Invalid email address at row ${row + 1}, column ${col + 1}`);
@@ -26,7 +41,7 @@ const Grid = () => {
     const endRow = startRow + rowsPerPage;
     const rows = [];
 
-    // Add labels for the columns
+ 
     rows.push(
       <div key="labels" style={{ display: 'flex', fontWeight: 'bold', backgroundColor: '#f3f4f6', padding: '0.5rem 0' }}>
         <div style={{ flex: '1 1 6rem', textAlign: 'center', padding: '0 0.5rem' }}>Numbers</div>
@@ -37,8 +52,8 @@ const Grid = () => {
       </div>
     );
 
-    // Render the grid cells for the current page
-    for (let i = startRow; i < endRow; i++) {
+   
+    for (let i = startRow; i < endRow && i < data.length; i++) {
       const cells = [];
       for (let j = 0; j < 50; j++) {
         const cellValue = data[i][j] || '';
@@ -53,8 +68,8 @@ const Grid = () => {
               border: '1px solid #ccc',
               padding: '0 0.5rem',
               backgroundColor: isHighlighted ? '#fef3c7' : 'white',
-              minWidth: '5rem', // Ensure a minimum width on small screens
-              maxWidth: '12rem', // Cap the width for larger screens
+              minWidth: '5rem',
+              maxWidth: '12rem',
             }}
             value={cellValue}
             onChange={(e) => handleCellChange(e, i, j)}
@@ -74,16 +89,57 @@ const Grid = () => {
 
   const totalPages = Math.ceil(data.length / rowsPerPage);
 
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+  const renderPagination = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          style={{
+            padding: '0.5rem 1rem',
+            margin: '0 0.25rem',
+            backgroundColor: currentPage === i ? '#e0e0e0' : 'white',
+            border: '1px solid #ccc',
+            cursor: 'pointer',
+          }}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '1rem' }}>
+        <button
+          onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+          disabled={currentPage === 1}
+          style={{ padding: '0.5rem 1rem', marginRight: '0.5rem' }}
+        >
+          Previous
+        </button>
+        {pageNumbers}
+        <button
+          onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+          disabled={currentPage === totalPages}
+          style={{ padding: '0.5rem 1rem', marginLeft: '0.5rem' }}
+        >
+          Next
+        </button>
+      </div>
+    );
   };
 
   return (
@@ -91,17 +147,7 @@ const Grid = () => {
       <div style={{ overflowX: 'auto', overflowY: 'hidden', marginBottom: '1rem' }}>
         {renderGrid()}
       </div>
-      <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-        <button onClick={handlePreviousPage} disabled={currentPage === 1} style={{ padding: '0.5rem 1rem' }}>
-          Previous
-        </button>
-        <span style={{ margin: '0 1rem' }}>
-          Page {currentPage} of {totalPages}
-        </span>
-        <button onClick={handleNextPage} disabled={currentPage === totalPages} style={{ padding: '0.5rem 1rem' }}>
-          Next
-        </button>
-      </div>
+      {renderPagination()}
     </div>
   );
 };
