@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Spreadsheet App
+
+A Google Sheets-inspired spreadsheet application built with **Next.js**, **TypeScript**, and **Zustand** for state management. Supports formula evaluation, cell referencing, and real-time updates across the grid.
+
+## Features
+
+- **Editable grid** — click any cell to edit; supports keyboard navigation
+- **Formula support** — evaluate basic arithmetic formulas (e.g. `=A1+B2`, `=SUM(A1:A5)`)
+- **Cell referencing** — formulas update reactively when referenced cells change
+- **Zustand store** — global spreadsheet state managed cleanly outside React components
+- **Tailwind CSS styling** — clean, minimal UI
+
+## Tech Stack
+
+- Next.js (App Router)
+- TypeScript
+- Zustand (state management)
+- Tailwind CSS
+
+## Project Structure
+
+```
+spreadsheet-app/
+├── app/        # Next.js app directory
+├── store/      # Zustand store for cell state
+└── public/     # Static assets
+```
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Design Decisions
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- **Zustand over Context** — chosen for its minimal boilerplate and ability to handle frequent cell updates without unnecessary re-renders across the entire grid
+- **Formula evaluation** — formulas are parsed and evaluated client-side; cell dependency graph is tracked to trigger re-evaluation on changes
